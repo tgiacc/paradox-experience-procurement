@@ -1,8 +1,7 @@
 # The Paradox of Experience — replication code
 
-Code for *"The Paradox of Experience: How Organizational Complexity and
-Technological Integration Shape Public Procurement Timelines for Digital
-Solutions"* (GIQ-D-25-01214).
+Code for *"The Paradox of Experience: Public Procurement and Delivery
+Timelines across Digital Solution Types"* (GIQ-D-25-01214).
 
 The raw administrative data cannot be redistributed; `data/df_cup.rds`, our
 own constructed dataset, can be and is included when present. See `DATA.md`

@@ -23,7 +23,7 @@ library(anytime)
 library(survival)
 
 ### CANDIDATURE - last update: 03182025 ###
-all <- read.csv2("C:/Users/tgiac/OneDrive - Politecnico di Milano/Tommaso Giaccardi/Research/Procurement/Data/OpenCUP/candidature_comuni.csv", sep=";")
+all <- read.csv2("data/raw/OpenCUP/candidature_comuni.csv", sep=";")
 
 all <- all %>%
  clean_names()
@@ -42,7 +42,7 @@ admitted <- all %>%
 # Replace with the correct path if working locally
 
 #import and clean column names
-file_path <- "C:/Users/tgiac/OneDrive - Politecnico di Milano/Tommaso Giaccardi/Research/Procurement/Data/PNRR/PNRR_Iter_di_progetto_v3_M1.xlsx"
+file_path <- "data/raw/PNRR/PNRR_Iter_di_progetto_v3_M1.xlsx"
 
 date_columns <- 7:11  # Columns 7 to 11 are the ones that start with "data_inizio" or "data_fine"
 
@@ -157,28 +157,28 @@ df1$data_finanziamento <- as.Date(df1$data_finanziamento, format="%d/%m/%Y")
 
 ### ANCI ###
 
-file_path <- "C:/Users/tgiac/OneDrive - Politecnico di Milano/Tommaso Giaccardi/Research/Procurement/Data/ANCI/2024_10_29_data_cleaned.xlsx"
+file_path <- "data/raw/ANCI/2024_10_29_data_cleaned.xlsx"
 ANCI <- read_xlsx(file_path)
 ANCI <- ANCI %>%
  clean_names()
 
 ### CODICE FISCALE (fiscal ID) ###
 
-file_path <- "C:/Users/tgiac/OneDrive - Politecnico di Milano/Tommaso Giaccardi/Research/Procurement/Data/Codice fiscale/enti.xlsx"
+file_path <- "data/raw/Codice fiscale/enti.xlsx"
 codice_fiscale <- read_xlsx(file_path)
 codice_fiscale <- codice_fiscale %>%
  rename(codice_ipa = Codice_IPA, codice_fiscale = Codice_fiscale_ente)
 
 ### WORKFORCE ###
 
-file_path <- "C:/Users/tgiac/OneDrive - Politecnico di Milano/Tommaso Giaccardi/Research/Procurement/Data/Dipendenti_PAL/Anagrafe-Enti---Ente.xlsx"
+file_path <- "data/raw/Dipendenti_PAL/Anagrafe-Enti---Ente.xlsx"
 BDAP_id <- read_excel(file_path)
 BDAP_id <- BDAP_id %>%
  rename(codice_ipa = Codice_Ente_IPA)
 BDAP_id <- BDAP_id %>%
  mutate(codice_ipa = tolower(codice_ipa))
 
-file_path <- "C:/Users/tgiac/OneDrive - Politecnico di Milano/Tommaso Giaccardi/Research/Procurement/Data/Dipendenti_PAL/2022---Dipendenti-Pubblici---Anzianita---Dati-analitici-per-Ente.xlsx"
+file_path <- "data/raw/Dipendenti_PAL/2022---Dipendenti-Pubblici---Anzianita---Dati-analitici-per-Ente.xlsx"
 civ_servants_age <- read_excel(file_path) %>%
  clean_names()
 
@@ -210,16 +210,16 @@ civ_servants_age$servants <- civ_servants_age$men+civ_servants_age$women
 civ_servants_age$u35_pct <- civ_servants_age$u35/civ_servants_age$servants*100
 
 
-file_path <- "C:/Users/tgiac/OneDrive - Politecnico di Milano/Tommaso Giaccardi/Research/Procurement/Data/Dipendenti_PAL/2022---Dipendenti-Pubblici---Occupazione-Complessiva---Dati-analitici-per-Ente.xlsx"
+file_path <- "data/raw/Dipendenti_PAL/2022---Dipendenti-Pubblici---Occupazione-Complessiva---Dati-analitici-per-Ente.xlsx"
 civ_servants_contract <- read_excel(file_path)
 
 
-file_path <- "C:/Users/tgiac/OneDrive - Politecnico di Milano/Tommaso Giaccardi/Research/Procurement/Data/Dipendenti_PAL/2022---Dipendenti-Pubblici---Occupazione-e-Turnover---Dati-analitici-per-Ente.xlsx"
+file_path <- "data/raw/Dipendenti_PAL/2022---Dipendenti-Pubblici---Occupazione-e-Turnover---Dati-analitici-per-Ente.xlsx"
 civ_servants_turnover <- read_excel(file_path)
 
 ###GDP###
 
-file_path <- "C:/Users/tgiac/OneDrive - Politecnico di Milano/Tommaso Giaccardi/Research/Procurement/Data/GDP per capita/Redditi_e_principali_variabili_IRPEF_su_base_comunale_CSV_2022.xlsx"
+file_path <- "data/raw/GDP per capita/Redditi_e_principali_variabili_IRPEF_su_base_comunale_CSV_2022.xlsx"
 GDP <- read_excel(file_path)
 
 GDP <- GDP %>%
@@ -236,7 +236,7 @@ rm(url)
 
 ###TEMPI DI PAGAMENTO ENTI LOCALI###
 
-file_path <- "C:/Users/tgiac/OneDrive - Politecnico di Milano/Tommaso Giaccardi/Research/Procurement/Data/Tempi_pagamento_PA/Tempi_pagamento_PA_FB.xlsx"
+file_path <- "data/raw/Tempi_pagamento_PA/Tempi_pagamento_PA_FB.xlsx"
 payment <- read_excel(file_path)
 
 payment <- payment %>%
@@ -248,19 +248,19 @@ payment <- payment %>%
 
 ###BIBLIOTECHE###
 
-file_path <- "C:/Users/tgiac/OneDrive - Politecnico di Milano/Tommaso Giaccardi/Research/Procurement/Data/Libraries/Libraries.xlsx"
+file_path <- "data/raw/Libraries/Libraries.xlsx"
 libraries <- read_excel(file_path)
 libraries <- clean_names(libraries)
 
 ### RTD ###
 
-file_path <- "C:/Users/tgiac/OneDrive - Politecnico di Milano/Tommaso Giaccardi/Research/Procurement/Data/RTD/RTD.xlsx"
+file_path <- "data/raw/RTD/RTD.xlsx"
 RTD <- read_excel(file_path)
 RTD <- clean_names(RTD)
 
 ### POPULATION ###
 
-file_path <- "C:/Users/tgiac/OneDrive - Politecnico di Milano/Tommaso Giaccardi/Research/Procurement/Data/Population/Codici-statistici-e-denominazioni-al-01_01_2022.xlsx"
+file_path <- "data/raw/Population/Codici-statistici-e-denominazioni-al-01_01_2022.xlsx"
 population <- read_excel(file_path)
 population <- clean_names(population)
 population <- population %>%
@@ -282,8 +282,8 @@ df1 <- df1 %>%
 ### PAST EXPENDITURE (from 2007 to 2021) ###
 
 # Define the folder path
-folder_path_CIG <- "C:/Users/tgiac/OneDrive - Politecnico di Milano/Tommaso Giaccardi/Research/Procurement/Data/Contracts/raw/CIG"
-folder_path_SMARTCIG <- "C:/Users/tgiac/OneDrive - Politecnico di Milano/Tommaso Giaccardi/Research/Procurement/Data/Contracts/raw/SMARTCIG"
+folder_path_CIG <- "data/raw/Contracts/CIG"
+folder_path_SMARTCIG <- "data/raw/Contracts/SMARTCIG"
 
 # Create a vector of years
 years <- 2007:2021
@@ -687,7 +687,7 @@ df1$late_award_dummy[df1$late_award<=0]<-0
 
 ### CUPs (project ID) - last update: 03252025 ###
 
-file_path <- "C:/Users/tgiac/OneDrive - Politecnico di Milano/Tommaso Giaccardi/Research/Procurement/Data/OpenCUP/"
+file_path <- "data/raw/OpenCUP/"
 cig_cup <- read.csv(paste0(file_path, "cup_csv.csv"),sep = ";")
 cig_cup <- cig_cup %>%
  rename(cig=CIG, cup=CUP)
@@ -696,7 +696,7 @@ cig_cup <- cig_cup %>%
 # Add cigs from 2022
 
 # Specify the folder path where the CSV files are located
-folder_path <- "C:/Users/tgiac/OneDrive - Politecnico di Milano/Tommaso Giaccardi/Research/Procurement/Data/Contracts/raw/CIG"
+folder_path <- "data/raw/Contracts/CIG"
 
 # Create a vector of file names to read
 file_names <- paste0("cig_csv_2022_", sprintf("%02d", 1:12), ".csv")
@@ -712,7 +712,7 @@ cig22 <- file_paths %>%
 # Add smartcigs from 2022
 
 # Specify the folder path where the CSV files are located
-folder_path <- "C:/Users/tgiac/OneDrive - Politecnico di Milano/Tommaso Giaccardi/Research/Procurement/Data/Contracts/raw/SMARTCIG"
+folder_path <- "data/raw/Contracts/SMARTCIG"
 
 # Create a vector of file names to read
 file_names <- paste0("smartcig_csv_2022_", sprintf("%02d", 1:12), ".csv")
@@ -728,7 +728,7 @@ smartcig22 <- file_paths %>%
 # Add cigs from 2023
 
 # Specify the folder path where the CSV files are located
-folder_path <- "C:/Users/tgiac/OneDrive - Politecnico di Milano/Tommaso Giaccardi/Research/Procurement/Data/Contracts/raw/CIG"
+folder_path <- "data/raw/Contracts/CIG"
 
 # Create a vector of file names to read
 file_names <- paste0("cig_csv_2023_", sprintf("%02d", 1:12), ".csv")
@@ -744,7 +744,7 @@ cig23 <- file_paths %>%
 # Add smartcigs from 2023
 
 # Specify the folder path where the CSV files are located
-folder_path <- "C:/Users/tgiac/OneDrive - Politecnico di Milano/Tommaso Giaccardi/Research/Procurement/Data/Contracts/raw/SMARTCIG"
+folder_path <- "data/raw/Contracts/SMARTCIG"
 
 # Create a vector of file names to read
 file_names <- paste0("smartcig_csv_2023_", sprintf("%02d", 1:12), ".csv")
@@ -770,7 +770,7 @@ file_names <- c("20240201-cig_csv.csv",
                 "20241201-cig_csv.csv")
 
 # Full path to the directory
-folder_path <- "C:/Users/tgiac/OneDrive - Politecnico di Milano/Tommaso Giaccardi/Research/Procurement/Data/Contracts/raw/CIG/"
+folder_path <- "data/raw/Contracts/CIG/"
 
 # Function to read each CSV file
 read_agg_csv <- function(file_name) {
@@ -792,7 +792,7 @@ file_names <- c("20240201-smartcig_csv.csv",
                 "20241201-smartcig_csv.csv")
 
 # Full path to the directory
-folder_path <- "C:/Users/tgiac/OneDrive - Politecnico di Milano/Tommaso Giaccardi/Research/Procurement/Data/Contracts/raw/SMARTCIG/"
+folder_path <- "data/raw/Contracts/SMARTCIG/"
 
 # Function to read each CSV file
 read_agg_csv <- function(file_name) {
@@ -807,7 +807,7 @@ file_names <- c("20250101-cig_csv.csv",
                 "20250401-cig_csv.csv")
 
 # Full path to the directory
-folder_path <- "C:/Users/tgiac/OneDrive - Politecnico di Milano/Tommaso Giaccardi/Research/Procurement/Data/Contracts/raw/CIG/"
+folder_path <- "data/raw/Contracts/CIG/"
 
 # Function to read each CSV file
 read_agg_csv <- function(file_name) {
