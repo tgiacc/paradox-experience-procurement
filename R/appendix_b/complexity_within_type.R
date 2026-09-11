@@ -9,9 +9,8 @@
 #   WITHIN solution type: a more experienced municipality may attempt a more
 #   ambitious project of a given kind, so the interaction would reflect what was
 #   attempted rather than how experience operated. The response letter cites two
-#   tests for this, both of which were originally run interactively. They are
-#   packaged here so that the numbers quoted to the reviewers are reproducible
-#   from the public repository.
+#   tests for this, packaged here so the numbers quoted to reviewers are
+#   reproducible from the public repository.
 #
 #   PART 1  fragmentation: does the number of contracts per project account for
 #           the interaction?

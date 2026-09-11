@@ -78,6 +78,7 @@ isolated("R/appendix_a/tableA3_A4_descriptives.R")
 # on it except the two lines immediately below.
 source("R/appendix_b/04_build_cio_subset.R") # cio_subset, for Table B5 only
 
+isolated("R/appendix_b/tableB1_comparison.R")
 isolated("R/appendix_b/tableB2_B3_B5.R")
 isolated("R/appendix_b/tableB4_fullsample.R")
 isolated("R/appendix_b/tableB6_fit.R")           # must run before the next
@@ -88,6 +89,7 @@ isolated("R/appendix_b/tableB6_significance.R")  # Table B6's significance/SE
 
 isolated("R/appendix_b/complexity_within_type.R")
 isolated("R/appendix_b/selection_into_types.R")
+isolated("R/appendix_b/tableB11_2024check.R")
 
 # R/appendix_b/sensitivity_aft.R is deliberately NOT sourced here, for the
 # same reason as oster_bounds.R below: it is not cited in the paper. Part 1's

@@ -63,13 +63,10 @@ m_comp_fe  <- fit_cox("completion","execution_status", d_comp,  RHS_FE)
 
 # run_all.R sources this script in its own isolated environment, so nothing
 # created above is visible afterward unless assigned to globalenv() here -
-# tableB5_significance.R (Table B6's significance/SE step) needs to find
-# these six model objects when it runs next. It ALSO needs the exact d_award/
-# d_exec/d_comp used to fit them (post prep_type() filtering) - relying on
-# whatever d_award happens to be in globalenv() at that later point gave a
-# different, wrong municipality count (7,428/7,273/7,428 instead of the
-# correct 7,047/6,918/7,047 that match Table A1), because prep_type()'s
-# filtering was never visible outside this script's own isolated scope.
+# tableB6_significance.R needs to find these six model objects when it runs
+# next, along with the exact d_award/d_exec/d_comp used to fit them (post
+# prep_type() filtering), not whatever those names happen to hold elsewhere
+# in the session.
 for (nm in c("m_award_nofe", "m_exec_nofe", "m_comp_nofe",
             "m_award_fe", "m_exec_fe", "m_comp_fe",
             "d_award", "d_exec", "d_comp")) {

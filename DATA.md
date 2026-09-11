@@ -16,13 +16,52 @@ terms apply, not shipped as copies.
 
 | Source | What it contributes | Availability |
 |---|---|---|
-| PA Digitale 2026 (Italia Domani / Dipartimento per la trasformazione digitale) | funded projects, decree dates, solution type (`avviso`), funding amounts, administrative milestones | public |
-| ANAC open data on public contracts | contract records, CIG identifiers, award value, procedure type, publication and completion timestamps, CPV codes | public |
-| CUP–CIG linkage table | joins projects to contracts | public |
-| AgID IndicePA | municipal identifiers, digital transformation officer records | public |
-| OpenBDAP / Ministry of Economy | supplier payment times, workforce composition | public |
-| ISTAT | resident population | public |
+| PA Digitale 2026 (Italia Domani / Dipartimento per la trasformazione digitale) | funded projects, decree dates, solution type (`avviso`), funding amounts, administrative milestones | public — CSV/JSON updated daily via GitHub Action: [github.com/teamdigitale/padigitale2026-opendata](https://github.com/teamdigitale/padigitale2026-opendata) (`data/KPI/candidature_comuni_finanziate.csv`); portal: [padigitale2026.gov.it/open-data](https://padigitale2026.gov.it/open-data) |
+| ANAC open data on public contracts | contract records, CIG identifiers, award value, procedure type, publication and completion timestamps, CPV codes | public — [dati.anticorruzione.it/opendata](https://dati.anticorruzione.it/opendata); per-year, per-month CIG and SmartCIG datasets follow the pattern `dati.anticorruzione.it/opendata/dataset/cig-{year}` and `.../smartcig-{year}`, matching the filenames `R/01_build_database.R` expects |
+| CUP–CIG linkage table | joins projects to contracts | public, published by ANAC alongside the contract data above |
+| AgID IndicePA — RTD dataset | municipal identifiers, digital transformation officer (RTD) establishment dates | public — [indicepa.gov.it/ipa-dati/dataset/responsabili-della-transizione-al-digitale](https://indicepa.gov.it/ipa-dati/dataset/responsabili-dellatransizione-al-digitale) |
+| OpenBDAP / Ministry of Economy | supplier payment times, workforce composition | public — payment times: [rgs.mef.gov.it/.../tempi_di_pagamento_e_debiti_commerciali_delle_pubbliche_amministrazioni](https://www.rgs.mef.gov.it/VERSIONE-I/tempi_di_pagamento_e_debiti_commerciali_delle_pubbliche_amministrazioni/) (the manuscript's citation of this URL is truncated by one word - corrected here); workforce: [bdap-opendata.rgs.mef.gov.it/content/2022-dipendenti-pubblici-occupazione-complessiva-dati-analitici-ente](https://bdap-opendata.rgs.mef.gov.it/content/2022-dipendenti-pubblici-occupazione-complessiva-dati-analitici-ente) and the sibling "Anzianità" dataset on the same portal |
+| ISTAT | resident population, municipality codes and names | public — [istat.it/classificazione/codici-dei-comuni-delle-province-e-delle-regioni](https://www.istat.it/classificazione/codici-dei-comuni-delle-province-e-delle-regioni/) (the standard downloadable file includes a population column alongside codes and names) |
 | ANCI survey on municipal IT capacity, 2024 | IT staff, CIO profile, used only in the Table B5 robustness check | **not ours to redistribute**; requests to ANCI |
+
+## Where the raw files go
+
+`R/01_build_database.R` expects the raw sources under `data/raw/`, in the
+subfolders below (these paths were hardcoded to a local machine in an earlier
+version of this script; they are relative now, both for portability and
+because the absolute path included the author's name and institution):
+
+```
+data/raw/OpenCUP/candidature_comuni.csv
+data/raw/PNRR/PNRR_Iter_di_progetto_v3_M1.xlsx
+data/raw/ANCI/2024_10_29_data_cleaned.xlsx
+data/raw/Codice fiscale/enti.xlsx
+data/raw/Dipendenti_PAL/*.xlsx           (four files)
+data/raw/Tempi_pagamento_PA/*.xlsx
+data/raw/RTD/RTD.xlsx
+data/raw/Population/*.xlsx
+data/raw/Contracts/CIG/                  (folder of per-year files)
+data/raw/Contracts/SMARTCIG/             (folder of per-year files)
+```
+
+Two sources that an earlier version of the script loaded - municipal income
+tax data ("GDP per capita") and a public-libraries dataset - are not in this
+list any more. Both were loaded and, in the case of income tax, joined into
+an intermediate frame, but neither ever fed a variable in the published
+models; removed from `R/01_build_database.R` rather than left as required
+inputs for nothing. A third source, a set of ISTAT municipal balance-sheet
+indicators pulled via SDMX, was also removed on the same grounds - it was
+actively joined in, but none of its nine financial indicators ever reached
+a published specification either. Removing it also fixes what would
+otherwise be a blocking bug: the script's own second join to a lagged
+version of this data (`balance_lagged`) referenced an object that was never
+created, since the code that would have built it was commented out.
+Anyone running the script from scratch would have hit an "object not found"
+error at that point, before ever reaching the payment-times merge or the
+past-expenditure construction later in the file.
+
+`data/` is gitignored except for `data/README.md`, so none of these ever get
+committed - see the note there.
 
 ## The two routes into stage 1
 
@@ -44,6 +83,30 @@ as `R/appendix_b/04_build_cio_subset.R`, since it genuinely builds a covariate t
 rather than analysing one.
 
 Alternatively, skip stage 1 entirely with the shortcut below.
+
+## Which projects are admitted
+
+Two filters determine which PA Digitale 2026 candidatures become part of the
+project frame, both applied in `R/01_build_database.R`.
+
+**Candidature status.** Only `stato_candidatura %in% c("A", "E")` is kept —
+accepted or executed candidatures (line 38). Rejected/withdrawn candidatures
+(`stato_candidatura == "R"`) are excluded: a withdrawn candidature never
+proceeds to procurement and generates no duration to observe.
+
+**Funding decree label.** `filter(str_detect(decreto_finanziamento, "2022|2023"))`
+(line 35) keeps candidatures whose decree text contains "2022" or "2023" -
+this is the origin of the "restricted to decrees issued by the end of 2023"
+language that was in an earlier design stage. `decreto_finanziamento` is a
+text label (e.g. "Decreto n.24 - 2 / 2022 - PNRR"), not the same field as
+`data_finanziamento` (the date `year` is derived from) - the two need not
+agree for every candidature, and empirically some do not: `year == "2024"`
+observations are present in the final frame (1,261 in the award and
+completion samples, 325 in execution) despite this filter. This was checked,
+not just noted: re-fitting the main models with these excluded changes no
+interaction coefficient's sign or significance level in any phase
+(`R/appendix_b/tableB11_2024check.R`, reported as Table B11 in the
+appendix).
 
 ## The shortcut: `df_cup.rds`
 

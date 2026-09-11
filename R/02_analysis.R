@@ -140,8 +140,8 @@ cat(sprintf("  single distinct COMPLETION value: %d of %d\n",
 #   outcomes and municipal covariates : constant within CUP -> first()
 #   contract value                    : SUM across the project's contracts,
 #                                       then logged (the project's total value)
-#   procedure type                    : procedure of the economically dominant
-#                                       lot (weighted mode by contract value)
+#   procedure type                    : value-weighted mode across the
+#                                       project's contracts
 #   n_cig                             : retained as a fragmentation control
 cat("\n\n########## PART 2 - COLLAPSE ##########\n")
 
@@ -637,10 +637,22 @@ aft_interactions <- function(mod, phase) {
 }
 
 PHASE_MAP <- c(AWARD = "award", EXEC = "execution", COMP = "completion")
-aft_original <- comparison %>%
-  filter(grepl("original \\(CIG\\)$", model), grepl(":type", term)) %>%
-  transmute(phase = unname(PHASE_MAP[sub(" .*", "", model)]),
-            type = sub(".*:type", "", term), aft_cig = round(est, 4))
+if (exists("comparison")) {
+  aft_original <- comparison %>%
+    filter(grepl("original \\(CIG\\)$", model), grepl(":type", term)) %>%
+    transmute(phase = unname(PHASE_MAP[sub(" .*", "", model)]),
+              type = sub(".*:type", "", term), aft_cig = round(est, 4))
+} else {
+  # comparison only exists when Part 4 ran, which needs the pre-collapse
+  # contract-level frame (df1_cig2). Using the df_cup.rds shortcut skips
+  # that frame entirely, so aft_cig - the contract-level coefficient this
+  # column compares against - has nothing to be computed from here.
+  cat("comparison not found (df_cup.rds shortcut in use): appendix_table's\n")
+  cat("aft_cig column will be NA - it needs the pre-collapse contract-level\n")
+  cat("frame, which this route does not build.\n")
+  aft_original <- tibble(phase = character(), type = character(),
+                          aft_cig = numeric())
+}
 
 appendix_table <- bind_rows(
   aft_interactions(m_award, "award"),
@@ -662,13 +674,11 @@ write.csv(appendix_table, "outputs/appendix_table.csv", row.names = FALSE)
 print(as.data.frame(appendix_table), row.names = FALSE)
 
 # --- Table C1 / Table A1 Panel A: every row counts projects ------------------
-# Restructured to match the paper's own three-step breakdown exactly, rather
-# than the previous two-step version, which silently folded the "no ANAC
-# contract record" exclusion into what it labelled "log-covariate filter" -
-# importo_gara_tot = 0 for those 10,132 projects fails log(...) >= 0 along
-# with genuine covariate-missingness cases, so the old single step reported
-# 30,835 where the two causes, split apart as the paper does, are 10,132 and
-# 68 (award/completion) or 1,816 (execution) respectively.
+# Matches the paper's own three-step breakdown: importo_gara_tot = 0 for the
+# 10,132 projects with no ANAC contract record fails log(...) >= 0 alongside
+# genuine covariate-missingness cases, so folding both into a single
+# "log-covariate filter" step would conflate two different causes. Split
+# apart, they are 10,132 and 68 (award/completion) or 1,816 (execution).
 attrition_col <- function(dat, outcome, status) {
   s1 <- dat[!is.na(dat$importo_gara_tot) & dat$importo_gara_tot > 0, ]
   # "outcome could not be constructed" checks only that the duration exists

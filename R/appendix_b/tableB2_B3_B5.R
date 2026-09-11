@@ -3,21 +3,14 @@
 #
 # Run AFTER R/02_analysis.R, R/03_prepare_extras.R and R/04_build_cio_subset.R.
 #
-# WHY THIS SCRIPT EXISTS
-#   These three tables were built once, interactively, and never saved as a
-#   file of their own; the numbers they produce are in the manuscript, but
-#   until now the code that produces them was not in the repository. This
-#   reconstructs it from that session, adapted to run in an isolated
-#   environment like the rest of R/tables and R/robustness.
-#
 #   B2  Cox regressions with interactions, project level, no municipality
 #       strata. Signs are reversed relative to the AFT tables: a positive Cox
 #       coefficient is a HIGHER completion hazard, that is a SHORTER duration.
 #   B3  Weibull AFT with interactions, direct awards only. At project level,
-#       tipo_scelta_contraente is the procedure of the economically dominant
-#       lot, so this subsample is not the previous one collapsed: it is
-#       composed differently, and its N is not directly comparable to a
-#       contract-level figure.
+#       tipo_scelta_contraente takes the value-weighted mode across a
+#       project's contracts, so this subsample is not the previous one
+#       collapsed: it is composed differently, and its N is not directly
+#       comparable to a contract-level figure.
 #   B4  Weibull AFT with municipal IT capacity controls (ANCI 2024 survey).
 #       The survey covers a subset of municipalities, which is why this
 #       table's N is far smaller than the others.

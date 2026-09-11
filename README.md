@@ -81,6 +81,7 @@ regardless of the true confound. Left in the repository, not sourced by
 | Table A1, sample attrition | `R/02_analysis.R` | `table_c1_attrition.csv`† |
 | Table A3/A4, descriptives (completed/ongoing subsamples) | `R/appendix_a/tableA3_A4_descriptives.R` | `tableA3_completed.csv`, `tableA4_ongoing.csv` |
 | Table A5, multicollinearity diagnostics (GVIF) | `R/appendix_a/tableA5_gvif.R` | `tableA5_gvif.csv` |
+| Table B1, model performance (Cox vs. Weibull, with interactions) | `R/appendix_b/tableB1_comparison.R` | `tableB1_cox_vs_weibull.csv` |
 | Table B2, Cox with interactions | `R/appendix_b/tableB2_B3_B5.R` | `tableB2_cox.csv` |
 | Table B3, direct awards only | `R/appendix_b/tableB2_B3_B5.R` | `tableB3_direct.csv` |
 | Table B4, full project frame with lump-sum funding | `R/appendix_b/tableB4_fullsample.R` | `tableB4_fullsample.csv`, `tableB4_vs_main.csv` |
@@ -89,8 +90,10 @@ regardless of the true confound. Left in the repository, not sourced by
 | Table B6, municipality-stratified Cox | `R/02_analysis.R` + `R/appendix_b/tableB6_fit.R` + `R/appendix_b/tableB6_significance.R` | `fe_common_reference.csv`, `tableB6_with_se.csv`, `tableB6_counts.csv` |
 | Raw stratified-Cox coefficients (feeds Table B6) | `R/02_analysis.R` | `fe_results.csv` |
 | Table B7, fragmentation and financial-scope checks (Section 6.3) | `R/appendix_b/complexity_within_type.R`, Parts 1-2 | `complexity_fragmentation.csv`, `complexity_scope.csv` |
-| Table B8, selection into solution types / portfolio breadth (Section 6.3) | `R/appendix_b/selection_into_types.R` | `selection_by_type.csv`, `selection_breadth.csv` |
+| Table B8, selection into solution types / portfolio breadth (Section 6.3) | `R/appendix_b/selection_into_types.R`, Part 4 (breadth) | `selection_by_type.csv`, `selection_breadth.csv` |
 | Table B9, financial-scope check with the full Table 4/6 covariate set | `R/appendix_b/complexity_within_type.R`, Part 2b | `tableB9_scope_full.csv` |
+| Table B10, internal-contrast subsample (municipalities holding both a positive- and negative-interaction type), all three phases | `R/appendix_b/selection_into_types.R`, Part 5 | `selection_internal_contrast_all_phases.csv` |
+| Table B11, robustness to 2024-admitted projects | `R/appendix_b/tableB11_2024check.R` | `tableB11_2024_admissions.csv` |
 | Supplementary sample counts (Appendix C, not in the main tables) | `R/02_analysis.R` | `appendix_c_supplementary.csv` |
 | Unit-of-analysis correction (Section 3.2) | `R/02_analysis.R`, Parts 1 and 4 | `collapse_comparison.csv` |
 
@@ -115,26 +118,3 @@ coefficient.
 
 `df1_cig2` is an alias for `df1_cig`, created at the end of
 `R/01_build_database.R`. Both names work.
-
-## Completeness
-
-Every script above was checked against what it writes to `outputs/`.
-`R/main_tables/table2_descriptives.R` and `table5_comparison.R` are
-reconstructions — no original script existed for Table 2 or 5 — and each
-checks its own output against the published N or log-likelihood values.
-
-## Excluded analyses
-
-Work that reached a dead end or was superseded during revision:
-
-- A difference-in-discontinuities design on the population thresholds that
-  set contractual deadlines. Abandoned: the treatment bundles a longer
-  deadline with a larger grant, and the effect does not replicate at the
-  second threshold where the same deadline rule applies.
-- A specification adding population-band-by-solution-type interactions. Not
-  in the published models: with those terms included, the
-  experience-by-type interactions shrink substantially and joint tests do
-  not reject at 5% in any phase; a likelihood ratio test rejects additivity
-  of the band-by-type cells.
-
-Both available on request.

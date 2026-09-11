@@ -5,3 +5,4 @@ outputs/
 *.Rproj
 data/*
 !data/README.md
+!data/df_cup.rds

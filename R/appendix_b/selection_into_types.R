@@ -219,37 +219,54 @@ if (nrow(res4)) {
     cat("Not enough municipalities at higher breadth thresholds to estimate.\n")
 }
 
-# A sharper version: municipalities that hold BOTH a type with a positive
-# interaction and one with a negative interaction. There the contrast is internal
-# by construction and no portfolio choice can generate it.
-cat("\n--- municipalities holding both a positive-interaction and a\n")
-cat("    negative-interaction type (internal contrast by construction) ---\n\n")
-
+# POS/NEG define the internal-contrast subsample: municipalities holding
+# both a type with a positive interaction and one with a negative
+# interaction, where the contrast is internal by construction and no
+# portfolio choice can generate it. Used by Part 5 below, which runs this
+# check across all three phases.
 POS <- c("Citizen Experience", "Cloud")
 NEG <- c("Digital Notices")
-both <- fe_comp %>% group_by(codice_ipa) %>%
-    filter(any(type %in% POS), any(type %in% NEG)) %>% ungroup() %>%
-    mutate(type = set_ref_last(type))
 
-cat(sprintf("Projects: %s | municipalities: %s\n",
-            format(nrow(both), big.mark = ","),
-            format(n_distinct(both$codice_ipa), big.mark = ",")))
-if (nrow(both) > 500 && n_distinct(both$codice_ipa) > 100) {
-    mb <- suppressWarnings(coxph(
-        as.formula(sprintf("Surv(completion, execution_status) ~ %s", FE_RHS)), data = both))
-    s <- summary(mb)$coefficients
+
+# =============================================================================
+# PART 5 - INTERNAL-CONTRAST SUBSAMPLE (TABLE B10), ALL THREE PHASES
+#
+# Municipalities holding both a positive-interaction type (POS) and a
+# negative-interaction type (NEG, both defined in Part 4 above) - the
+# contrast is internal by construction there, so portfolio selection cannot
+# explain it. Run across all three phases, not completion alone.
+# =============================================================================
+
+fit_internal_contrast <- function(dat, phase_t, phase_s, phase_label) {
+    both <- dat %>% group_by(codice_ipa) %>%
+        filter(any(type %in% POS), any(type %in% NEG)) %>% ungroup() %>%
+        mutate(type = set_ref_last(type))
+    cat(sprintf("\n%s - projects: %s | municipalities: %s\n", phase_label,
+                format(nrow(both), big.mark = ","),
+                format(n_distinct(both$codice_ipa), big.mark = ",")))
+    if (nrow(both) < 500 || n_distinct(both$codice_ipa) < 100) {
+        cat("  Too few municipalities to estimate.\n")
+        return(NULL)
+    }
+    m <- suppressWarnings(coxph(
+        as.formula(sprintf("Surv(%s, %s) ~ %s", phase_t, phase_s, FE_RHS)), data = both))
+    s <- summary(m)$coefficients
     keep <- grep("log_digital_expenditure", rownames(s), value = TRUE)
-    out <- data.frame(
-        type = gsub("^type|:log_digital_expenditure$|^log_digital_expenditure:type", "", keep),
-        est = round(as.numeric(s[keep, "coef"]), 4),
-        se = round(as.numeric(s[keep, "se(coef)"]), 4),
-        sig = stars(as.numeric(s[keep, "Pr(>|z|)"])),
-        stringsAsFactors = FALSE)
-    print(as.data.frame(out %>% filter(!is.na(est))), row.names = FALSE)
-    cat("\nCompare with the full stratified column of Table B6: Citizen Experience\n")
-    cat("-0.0598, Cloud -0.0548, Digital Notices +0.0097. Similar magnitudes here\n")
-    cat("mean the result survives on the subsample where portfolio choice cannot\n")
-    cat("explain it.\n")
-} else {
-    cat("Too few municipalities hold both kinds of type to estimate separately.\n")
+    data.frame(phase = phase_label,
+               type = gsub("^type|:log_digital_expenditure$|^log_digital_expenditure:type", "", keep),
+               est = round(as.numeric(s[keep, "coef"]), 4),
+               se = round(as.numeric(s[keep, "se(coef)"]), 4),
+               sig = stars(as.numeric(s[keep, "Pr(>|z|)"])),
+               stringsAsFactors = FALSE) %>%
+        filter(!is.na(est))
 }
+
+contrast_all <- bind_rows(
+    fit_internal_contrast(fe_award, AWARD_TIME, AWARD_STATUS, "Award"),
+    fit_internal_contrast(fe_exec, "execution", "execution_status", "Execution"),
+    fit_internal_contrast(fe_comp, "completion", "execution_status", "Completion")
+)
+
+cat("\n=== Internal contrast, all three phases ===\n\n")
+print(as.data.frame(contrast_all), row.names = FALSE)
+write.csv(contrast_all, "outputs/selection_internal_contrast_all_phases.csv", row.names = FALSE)

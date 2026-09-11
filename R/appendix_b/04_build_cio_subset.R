@@ -1,11 +1,10 @@
 # =============================================================================
 # BUILD THE CIO SURVEY SUBSET, FOR TABLE B5 (MUNICIPAL IT CAPACITY CONTROLS)
 #
-# Run AFTER R/01_build_database.R. Extracted from what was originally a single
-# undifferentiated block inside that file, mixed in with the modelling code
-# that used it. It is separated out because it is a genuine build step -
-# raw survey responses in, a clean covariate table out - and belongs with
-# the other data-preparation scripts rather than with an analysis script.
+# Run AFTER R/01_build_database.R. Separated from that file because it is a
+# genuine build step - raw survey responses in, a clean covariate table out -
+# and belongs with the other data-preparation scripts rather than with an
+# analysis script.
 #
 # The survey (ANCI, 2024) is not ours to redistribute; see DATA.md.
 # =============================================================================
