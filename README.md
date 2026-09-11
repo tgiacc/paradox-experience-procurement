@@ -47,26 +47,6 @@ same local variable names. Running scripts by hand: restart from
 `R/appendix_b/04_build_cio_subset.R` needs the 2024 ANCI survey, which is
 restricted-access (`DATA.md`) and used only for Table B5.
 
-### Scripts not run by default
-
-`R/appendix_b/oster_bounds.R` computes Oster (2019) coefficient-stability
-bounds. Not cited in the manuscript or appendix. The method is derived for
-OLS; the paper's models are AFT/Cox with censoring. The delta values
-obtained (13.6, 22.0) reflect a stable coefficient across specifications
-rather than a high R², and the proportional-selection assumption has no
-clear justification when the "treatment" is a project category and the
-controls are municipal characteristics. Left in the repository, not sourced
-by `run_all.R`.
-
-`R/appendix_b/sensitivity_aft.R` — not cited, for two reasons. Part 1
-(coefficient movement across nested control blocks) shows a 32-41%
-excursion for Digital Notices and Digital Services and Payments, the two
-weakest categories elsewhere in this project, so it does not support a
-stability claim for them. Part 2 (a simulated confounder) is constructed
-orthogonal to solution type by design, so it cannot break the interaction
-regardless of the true confound. Left in the repository, not sourced by
-`run_all.R`.
-
 ## Script-to-table mapping
 
 | Manuscript item | Script | Output file |
