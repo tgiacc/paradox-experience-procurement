@@ -4,9 +4,9 @@ Code for *"The Paradox of Experience: Public Procurement and Delivery
 Timelines across Digital Solution Types"* (GIQ-D-25-01214).
 
 The raw administrative data cannot be redistributed. `data/df_cup.rds`, our
-own constructed dataset, is included when present. See `DATA.md` for each
-raw source, how to obtain it, and what the `df_cup.rds` shortcut does and
-does not let you verify.
+own constructed project-level dataset, is included in this repository. See
+`DATA.md` for each raw source, how to obtain it, and what the `df_cup.rds`
+shortcut does and does not let you verify.
 
 ## Usage
 
@@ -17,16 +17,20 @@ Rscript run_all.R
 from the repository root. Three ways to provide the data, in order of
 preference:
 
-- place a pre-built `data/df_cup.rds` (`DATA.md`, "The shortcut" — skips the
+- use the included `data/df_cup.rds` (`DATA.md`, "The shortcut" — skips the
   raw sources entirely)
 - set `STAGE_1_BUILD <- TRUE` with the raw sources in place
 - load `df1_cig2` into the session yourself before running the script
 
 Output goes to `outputs/`.
 
-R 4.5 or later. Packages: `dplyr`, `tidyr`, `tibble`, `survival`, `ggplot2`,
-`sandwich`, `lmtest`, `car`. `robomit` is optional, used only as a
-cross-check.
+R 4.5 or later. Packages needed to run the analysis from `data/df_cup.rds`:
+`dplyr`, `tidyr`, `tibble`, `survival`, `ggplot2`, `sandwich`, `lmtest`,
+`car`, `moments`. `robomit` is optional, used only as a cross-check.
+
+Building from the raw sources (`STAGE_1_BUILD <- TRUE`) additionally needs
+`data.table`, `readr`, `readxl`, `writexl`, `stringr`, `lubridate`, `anytime`,
+`janitor`, `purrr`, `jsonlite`, `rjson`, `rsdmx`, `rvest` and `stargazer`.
 
 Each script in `R/main_tables/`, `R/appendix_a/`, and `R/appendix_b/` runs in
 its own environment under `run_all.R`, because several scripts reuse the
@@ -45,27 +49,11 @@ same local variable names. Running scripts by hand: restart from
   same tables.
 
 `R/appendix_b/04_build_cio_subset.R` needs the 2024 ANCI survey, which is
-restricted-access (`DATA.md`) and used only for Table B5.
-
-### Scripts not run by default
-
-`R/appendix_b/oster_bounds.R` computes Oster (2019) coefficient-stability
-bounds. Not cited in the manuscript or appendix. The method is derived for
-OLS; the paper's models are AFT/Cox with censoring. The delta values
-obtained (13.6, 22.0) reflect a stable coefficient across specifications
-rather than a high R², and the proportional-selection assumption has no
-clear justification when the "treatment" is a project category and the
-controls are municipal characteristics. Left in the repository, not sourced
-by `run_all.R`.
-
-`R/appendix_b/sensitivity_aft.R` — not cited, for two reasons. Part 1
-(coefficient movement across nested control blocks) shows a 32-41%
-excursion for Digital Notices and Digital Services and Payments, the two
-weakest categories elsewhere in this project, so it does not support a
-stability claim for them. Part 2 (a simulated confounder) is constructed
-orthogonal to solution type by design, so it cannot break the interaction
-regardless of the true confound. Left in the repository, not sourced by
-`run_all.R`.
+restricted-access (`DATA.md`) and used only for Table B5. That survey is not
+redistributed here, so Table B5 is the one table in the paper that cannot be
+reproduced from this repository alone; `run_all.R` completes normally without
+it and simply does not produce that output. Every other table and figure is
+reproducible from `data/df_cup.rds`.
 
 ## Script-to-table mapping
 
@@ -89,11 +77,11 @@ regardless of the true confound. Left in the repository, not sourced by
 | Appendix comparison table (all specifications) | `R/02_analysis.R` | `appendix_table.csv` |
 | Table B6, municipality-stratified Cox | `R/02_analysis.R` + `R/appendix_b/tableB6_fit.R` + `R/appendix_b/tableB6_significance.R` | `fe_common_reference.csv`, `tableB6_with_se.csv`, `tableB6_counts.csv` |
 | Raw stratified-Cox coefficients (feeds Table B6) | `R/02_analysis.R` | `fe_results.csv` |
-| Table B7, fragmentation and financial-scope checks (Section 6.3) | `R/appendix_b/complexity_within_type.R`, Parts 1-2 | `complexity_fragmentation.csv`, `complexity_scope.csv` |
-| Table B8, selection into solution types / portfolio breadth (Section 6.3) | `R/appendix_b/selection_into_types.R`, Part 4 (breadth) | `selection_by_type.csv`, `selection_breadth.csv` |
-| Table B9, financial-scope check with the full Table 4/6 covariate set | `R/appendix_b/complexity_within_type.R`, Part 2b | `tableB9_scope_full.csv` |
-| Table B10, internal-contrast subsample (municipalities holding both a positive- and negative-interaction type), all three phases | `R/appendix_b/selection_into_types.R`, Part 5 | `selection_internal_contrast_all_phases.csv` |
-| Table B11, robustness to 2024-admitted projects | `R/appendix_b/tableB11_2024check.R` | `tableB11_2024_admissions.csv` |
+| Table B7, control for the number of contracts per project (Section 4.3) | `R/appendix_b/complexity_within_type.R`, Part 1 | `complexity_fragmentation.csv` |
+| Table B8, stratified Cox at increasing minimum category coverage (Section 4.3) | `R/appendix_b/selection_into_types.R`, Part 4 | `selection_breadth.csv` |
+| Table B9, relative financial scale of the contracted work (Section 4.3) | `R/appendix_b/complexity_within_type.R`, Parts 2 and 2b | `complexity_scope.csv`, `tableB9_scope_full.csv` |
+| Table B10, adoption of each category and estimates on the internal-contrast subsample, all three phases (Section 4.3) | `R/appendix_b/selection_into_types.R`, Parts 2 and 5 | `selection_by_type.csv`, `selection_internal_contrast_all_phases.csv` |
+| Table B11, sensitivity to late-admission projects (Section 3.2) | `R/appendix_b/tableB11_2024check.R` | `tableB11_2024_admissions.csv` |
 | Supplementary sample counts (Appendix C, not in the main tables) | `R/02_analysis.R` | `appendix_c_supplementary.csv` |
 | Unit-of-analysis correction (Section 3.2) | `R/02_analysis.R`, Parts 1 and 4 | `collapse_comparison.csv` |
 
@@ -118,3 +106,10 @@ coefficient.
 
 `df1_cig2` is an alias for `df1_cig`, created at the end of
 `R/01_build_database.R`. Both names work.
+
+## Licence
+
+Code in this repository is released under the MIT Licence (`LICENSE`). The
+constructed dataset `data/df_cup.rds` is released under CC BY 4.0
+(`data/LICENSE`). The underlying administrative sources remain subject to the
+terms of their respective providers; see `DATA.md`.

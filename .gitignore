@@ -6,3 +6,4 @@ outputs/
 data/*
 !data/README.md
 !data/df_cup.rds
+!data/LICENSE

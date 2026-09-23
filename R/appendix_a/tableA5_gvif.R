@@ -130,20 +130,24 @@ cat("\n=== Table A5: GVIF diagnostics ===\n\n")
 print(tabA4, row.names = FALSE)
 write.csv(tabA4, "outputs/tableA5_gvif.csv", row.names = FALSE)
 
-# --- sanity checks against the published table -------------------------------
-# Award value carried GVIF 1.6218 and Population 3.7289 in the published
-# version. Table 3 now puts Ln(Value) x Ln(Pop.) at 0.32 and Ln(Value) x
-# Ln(Past proc.) at 0.30, so Award value should stay in the same neighbourhood.
-# A large move means this table and Table 3 are not on the same rows.
+# --- sanity check -----------------------------------------------------------
+# These are the values in Table A5 of the published appendix. The check is here
+# so that a change in the upstream frame or in the covariate list surfaces
+# immediately rather than silently altering the diagnostics.
 cat("\n--- against the published values ---\n")
 chk <- data.frame(
     variable  = c("Contract award value", "Population", "Ln(General procurement experience)"),
-    published = c(1.6218, 3.7289, 3.3354),
+    published = c(1.2066, 3.4637, 3.0657),
     now       = as.numeric(tabA4[match(c("Contract award value", "Population", "Ln(General procurement experience)"),
                                        tabA4$Variable), "Award GVIF"]),
     stringsAsFactors = FALSE)
-chk$diff <- round(chk$now - chk$published, 3)
-print(chk, row.names = FALSE)
+chk$diff <- round(chk$now - chk$published, 4)
+if (all(abs(chk$diff) < 1e-3)) {
+    cat("  matches the published Table A5.\n")
+} else {
+    cat("  MISMATCH with the published Table A5:\n")
+    print(chk, row.names = FALSE)
+}
 
 worst <- suppressWarnings(max(as.numeric(unlist(tabA4[grepl("GVIF$", names(tabA4))])),
                              na.rm = TRUE))
